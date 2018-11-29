@@ -456,6 +456,14 @@ void processSongs()
                 playJingleBells();
             else if (currentSong == SONG_SILENTNIGHT)
                 playSilentNight();
+            else if (currentSong == SONG_ROCKINGAROUND)
+                playRockingAround();
+            else if (currentSong == SONG_CAROLOFTHEBELLS)
+                playCarolOfTheBells();
+            else
+            {
+                // do nothing
+            }   
         }
 
         delay(2000);
