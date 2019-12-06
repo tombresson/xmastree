@@ -28,16 +28,16 @@
  *
  */
 
-#include "xmastree.h"       // All macros (#define) are in xmastree.h
+#include "xmastree.h" // All macros (#define) are in xmastree.h
 #include <dotstar.h>
 
 /* Project name and version */
-#define WHOAMI              "XmasTree"
-#define VERSION             1
+#define WHOAMI "XmasTree"
+#define VERSION 1
 
 /* LED brightness value */
 /* Warning: less than 80 is highly recommended for safety and for your eyes */
-#define LED_BRIGHTNESS      30
+#define LED_BRIGHTNESS 30
 
 /* Project name and version */
 const char projName[] = WHOAMI;
@@ -54,6 +54,9 @@ int currentState = STATE_NONE;
 
 /* Set to TRUE to play the current song repeatedly */
 bool repeatSong = FALSE;
+
+// Will only play one song per event
+bool play_only_one_song = FALSE;
 
 /* Current button down */
 volatile int buttonState = BUTTON_NONE;
@@ -82,7 +85,7 @@ void joystickPortInit()
     pinMode(PIN_DOWN, INPUT_PULLUP);
     pinMode(PIN_LEFT, INPUT_PULLUP);
     pinMode(PIN_RIGHT, INPUT_PULLUP);
-    
+
     /* Using interrupts for the pins */
     attachInterrupt(PIN_CENTER, buttonHandler, FALLING);
     attachInterrupt(PIN_UP, buttonHandler, FALLING);
@@ -154,27 +157,38 @@ void publishSongChanged()
 #include "animations.h"
 
 /* The no. of songs and LED animations, defined in songs.h and animations.h */
-int songCount = SONG_COUNT; 
+int songCount = SONG_COUNT;
 int animationCount = ANIMATION_COUNT;
 
 /* Play a song by the song ID */
 int playSong(String songIndex)
 {
-    Serial.println("playSong");
-    
+    Serial.print("playSong: ");
+    Serial.println(songIndex);
+
     /* Stop the current playing song at once */
     changeSong = true;
 
     /* Set the current song and the song worker will play it */
     currentSong = atoi(songIndex);
 
-    /* Update the tree current state */    
+    /* Update the tree current state */
     if (currentState == STATE_NONE)
         currentState = STATE_SONG;
     else if (currentState == STATE_ANIMATION)
         currentState = STATE_BOTH;
-    
+
     return 1;
+}
+
+/* Play a song by the song ID */
+int playOneSong(String songIndex)
+{
+    Serial.println("playOneSong");
+
+    play_only_one_song = true;
+
+    playSong(songIndex);
 }
 
 /* Stop the current song playing */
@@ -185,12 +199,12 @@ int stopSong(String)
     /* Stop the current playing song at once */
     changeSong = true;
 
-    /* Update the tree current state */    
+    /* Update the tree current state */
     if (currentState == STATE_SONG)
         currentState = STATE_NONE;
     else if (currentState == STATE_BOTH)
         currentState = STATE_ANIMATION;
-        
+
     return 1;
 }
 
@@ -205,7 +219,7 @@ int playAnimation(String animationIndex)
     /* Set the current song and the animation worker will play it */
     currentAnimation = atoi(animationIndex);
 
-    /* Update the tree current state */    
+    /* Update the tree current state */
     if (currentState == STATE_NONE)
         currentState = STATE_ANIMATION;
     else if (currentState == STATE_SONG)
@@ -238,7 +252,7 @@ int toggleState()
     currentState++;
     if (currentState > STATE_MAX)
         currentState = 0;
-    
+
     Serial.println("toggleState");
 
     if (currentState == STATE_NONE || currentState == STATE_SONG)
@@ -257,26 +271,34 @@ int setState(String state)
 
     if (String(currentState) == state)
         return 0;
-        
-    if ( (state == "BOTH") || (state == String(STATE_BOTH)) ) {
+
+    if ((state == "BOTH") || (state == String(STATE_BOTH)))
+    {
         playSong(String(currentSong));
         playAnimation(String(currentAnimation));
         currentState = STATE_BOTH;
-    } else if ( (state == "SONG") || (state == String(STATE_SONG)) ) {
+    }
+    else if ((state == "SONG") || (state == String(STATE_SONG)))
+    {
         playSong(String(currentSong));
         stopAnimation("");
         currentState = STATE_SONG;
-    } else if ( (state == "ANIMATION") || (state == String(STATE_ANIMATION)) ) {
+    }
+    else if ((state == "ANIMATION") || (state == String(STATE_ANIMATION)))
+    {
         stopSong("");
         playAnimation(String(currentAnimation));
         currentState = STATE_ANIMATION;
-    } else if ( (state == "NONE") || (state == String(STATE_NONE)) ) {
+    }
+    else if ((state == "NONE") || (state == String(STATE_NONE)))
+    {
         stopSong("");
         stopAnimation("");
         currentState = STATE_NONE;
-    } else
+    }
+    else
         return -1;
-    
+
     return 1;
 }
 
@@ -285,12 +307,13 @@ int nextSong()
 {
     Serial.println("nextSong");
 
-    /* if the state is not playing song, then do nothing */ 
-    if ( (currentState == STATE_SONG) || (currentState == STATE_BOTH) ) {
+    /* if the state is not playing song, then do nothing */
+    if ((currentState == STATE_SONG) || (currentState == STATE_BOTH))
+    {
         currentSong++;
         if (currentSong == songCount)
             currentSong = 0;
-        
+
         changeSong = true;
     }
 
@@ -302,11 +325,12 @@ int prevSong()
 {
     Serial.println("prevSong");
 
-    if ( (currentState == STATE_SONG) || (currentState == STATE_BOTH) ) {
+    if ((currentState == STATE_SONG) || (currentState == STATE_BOTH))
+    {
         currentSong--;
         if (currentSong < 0)
-            currentSong = songCount-1;
-                
+            currentSong = songCount - 1;
+
         changeSong = true;
     }
 
@@ -314,15 +338,16 @@ int prevSong()
 }
 
 /* Start playing the next animation */
-int nextAnimation()
+int nextAnimation(String)
 {
     Serial.println("nextAnimation");
 
-    if ( (currentState == STATE_ANIMATION) || (currentState == STATE_BOTH) ) {
+    if ((currentState == STATE_ANIMATION) || (currentState == STATE_BOTH))
+    {
         currentAnimation++;
         if (currentAnimation == animationCount)
             currentAnimation = 0;
-            
+
         changeAnimation = true;
     }
 
@@ -330,18 +355,19 @@ int nextAnimation()
 }
 
 /* Start playing the previous LED animation */
-int prevAnimation()
+int prevAnimation(String)
 {
     Serial.println("prevAnimation");
 
-    if ( (currentState == STATE_ANIMATION) || (currentState == STATE_BOTH) ) {
+    if ((currentState == STATE_ANIMATION) || (currentState == STATE_BOTH))
+    {
         currentAnimation--;
         if (currentAnimation < 0)
-            currentAnimation = animationCount-1;
+            currentAnimation = animationCount - 1;
 
         changeAnimation = true;
     }
-    
+
     return currentAnimation;
 }
 
@@ -350,16 +376,16 @@ int buttonPressed(String direction)
 {
     Serial.print("buttonPressed: ");
     Serial.println(direction);
-    
-    if ( direction == "CENTER" || direction == String(BUTTON_CENTER) )
+
+    if (direction == "CENTER" || direction == String(BUTTON_CENTER))
         return toggleState();
-    else if ( direction == "UP" || direction == String(BUTTON_UP) )
-        return prevAnimation();
-    else if ( direction == "DOWN" || direction == String(BUTTON_DOWN) )
-        return nextAnimation();
-    else if ( direction == "LEFT" || direction == String(BUTTON_LEFT) )
+    else if (direction == "UP" || direction == String(BUTTON_UP))
+        return prevAnimation("");
+    else if (direction == "DOWN" || direction == String(BUTTON_DOWN))
+        return nextAnimation("");
+    else if (direction == "LEFT" || direction == String(BUTTON_LEFT))
         return prevSong();
-    else if ( direction == "RIGHT" || direction == String(BUTTON_RIGHT) )
+    else if (direction == "RIGHT" || direction == String(BUTTON_RIGHT))
         return nextSong();
     else
         return -1;
@@ -383,14 +409,15 @@ void buttonHandler()
 /* Process buttons for the 5-way joystick */
 void processButtons()
 {
-    if (buttonState != BUTTON_NONE) {
+    if (buttonState != BUTTON_NONE)
+    {
 
-        /* Wait until button up */        
-        if ( (digitalRead(PIN_CENTER) == LOW) || (digitalRead(PIN_UP) == LOW) ||
+        /* Wait until button up */
+        if ((digitalRead(PIN_CENTER) == LOW) || (digitalRead(PIN_UP) == LOW) ||
             (digitalRead(PIN_DOWN) == LOW) || (digitalRead(PIN_LEFT) == LOW) ||
-            (digitalRead(PIN_RIGHT) == LOW) )
+            (digitalRead(PIN_RIGHT) == LOW))
             return;
-        
+
         if (buttonState == BUTTON_CENTER)
             buttonPressed("CENTER");
         else if (buttonState == BUTTON_UP)
@@ -401,13 +428,13 @@ void processButtons()
             buttonPressed("LEFT");
         else if (buttonState == BUTTON_RIGHT)
             buttonPressed("RIGHT");
-        
+
         /* Clear the button state */
         buttonState = BUTTON_NONE;
     }
 }
 
-/* Button pressed from the cloud */ 
+/* Button pressed from the cloud */
 void buttonEventHandler(const char *event, const char *data)
 {
     if (String(event) == "btnPressed")
@@ -418,12 +445,14 @@ void buttonEventHandler(const char *event, const char *data)
 void processAnimations()
 {
     /* This is an endless loop to process the animations one by one */
-    while (1) {
+    while (1)
+    {
         changeAnimation = false;
 
-       if (currentState == STATE_BOTH || currentState == STATE_ANIMATION) {
+        if (currentState == STATE_BOTH || currentState == STATE_ANIMATION)
+        {
             if (currentAnimation == WHITEOVERRAINBOW)
-                whiteOverRainbow(20,75,5); 
+                whiteOverRainbow(20, 75, 5);
             else if (currentAnimation == RAINBOWFADE2WHITE)
                 rainbowFade2White(3, 6, 1);
             else if (currentAnimation == PULSEWHITE)
@@ -442,10 +471,12 @@ void processAnimations()
 void processSongs()
 {
     /* This is an endless loop to process the songs one by one */
-    while (1) {
+    while (1)
+    {
         changeSong = false;
 
-        if ( (currentState == STATE_BOTH) || (currentState == STATE_SONG) ) {
+        if ((currentState == STATE_BOTH) || (currentState == STATE_SONG))
+        {
             if (currentSong == SONG_JOYTOTHEWORLD)
                 playJoyToTheWorld();
             else if (currentSong == SONG_WEWHISHYOUAMERRYXMAS)
@@ -463,10 +494,29 @@ void processSongs()
             else
             {
                 // do nothing
-            }   
+            }
+
+            if (play_only_one_song)
+            {
+                if (currentState == STATE_BOTH)
+                {
+                    currentState = STATE_ANIMATION;
+                }
+                else if (currentState == STATE_SONG)
+                {
+                    currentState = STATE_NONE;
+                }
+                else
+                {
+                    // Do nothing
+                }
+
+                play_only_one_song = false;
+            }
         }
 
         delay(2000);
+
     }
 }
 
@@ -476,7 +526,7 @@ void cloudInit()
     /* Cloud variables */
     Particle.variable("whoami", projName);
     Particle.variable("version", version);
-    
+
     Particle.variable("songList", songList);
     Particle.variable("animList", animationList);
 
@@ -490,14 +540,17 @@ void cloudInit()
     Particle.function("playLED", playLED);
     Particle.function("btnPressed", buttonPressed);
     Particle.function("setState", setState);
-    Particle.function("playSong", playSong);
+    Particle.function("playSong", playOneSong); // Cloud should only ever play one song
     Particle.function("playAnim", playAnimation);
     Particle.function("stopSong", stopSong);
     Particle.function("stopAnim", stopAnimation);
+    Particle.function("nextAnim", nextAnimation);
+    Particle.function("prevAnim", prevAnimation);
+
 
     /* Cloud subscription */
     Particle.subscribe("btnPressed", buttonEventHandler);
-    
+
     /* Publish this event once connected to the cloud */
     publishConnected();
 }
@@ -509,17 +562,20 @@ void processCloud()
     static int savedAnimation = -1;
     static int savedState = -1;
 
-    if (savedSong != currentSong) {
+    if (savedSong != currentSong)
+    {
         savedSong = currentSong;
         publishSongChanged();
     }
-    
-    if (savedAnimation != currentAnimation) {
+
+    if (savedAnimation != currentAnimation)
+    {
         savedAnimation = currentAnimation;
         publishAnimationChanged();
     }
 
-    if (savedState != currentState) {
+    if (savedState != currentState)
+    {
         savedState = currentState;
         publishStateChanged();
     }
@@ -531,20 +587,23 @@ void printTree()
     static int savedSong = -1;
     static int savedAnimation = -1;
     static int savedState = -1;
-    
-    if (savedState != currentState) {
+
+    if (savedState != currentState)
+    {
         Serial.print("Current State: ");
         Serial.println(currentState);
         savedState = currentState;
     }
 
-    if (savedSong != currentSong) {
+    if (savedSong != currentSong)
+    {
         Serial.print("Current Song: ");
         Serial.println(currentSong);
         savedSong = currentSong;
     }
 
-    if (savedAnimation != currentAnimation) {
+    if (savedAnimation != currentAnimation)
+    {
         Serial.print("Current Animation: ");
         Serial.println(currentAnimation);
         savedAnimation = currentAnimation;
@@ -556,7 +615,7 @@ void setup()
 {
     /* LEDs setup */
     ledsInit();
-    
+
     /* 5-way joystick setup */
     joystickPortInit();
 
@@ -565,12 +624,12 @@ void setup()
 
     /* Cloud functions and variables setup */
     cloudInit();
-    
+
     /* Creating a thread for processing LED animations and songs */
     /* So that I can just need to keep track of the buttons and the cloud activities */
     animationWorker = new Thread("animation", processAnimations);
     songWorker = new Thread("song", processSongs);
-    
+
     /* Start to play the 1st song and LED animation */
     playSong("0");
     playAnimation("0");
@@ -581,11 +640,10 @@ void loop()
 {
     /* Print the tree info. */
     printTree();
-    
+
     /* Check if button pressed */
     processButtons();
-    
+
     /* Process the Cloud events */
     processCloud();
 }
-
