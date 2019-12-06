@@ -5,7 +5,8 @@
         "files.associations": {
             "*.ino": "cpp"
         },
-        "particle.targetDevice": "xmas_tree"
+        "particle.targetDevice": "xmas_tree",
+        "cortex-debug.openocdPath": "${command:particle.getDebuggerOpenocdPath}"
     },
     "folders": [
         {
