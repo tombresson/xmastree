@@ -17,6 +17,7 @@ pids
 *.out
 *.env # dotenv / autoenv config
 *.gz # gzip file
+*.bin
 
 ######################################################################## vim ##
 Session.vim # session file
