@@ -1,4 +1,4 @@
-import particle_keys
+from particle import particle_keys
 import requests
 import json
 
@@ -19,7 +19,7 @@ def getSongs():
     response_data = json.loads(r.text)
     key = 'result'
     if key in response_data:
-        return ([str(i) for i in response_data[key].split(',')])
+        return enumerate([str(i) for i in response_data[key].split(',')])
 
 
 def playSong(idx: int):
@@ -35,4 +35,4 @@ def prevAnimation():
     r = requests.post('https://api.particle.io/v1/devices/' + device_id + '/nextPrev',
                      params=token)
 
-main()
+# main()

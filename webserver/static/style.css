@@ -612,7 +612,7 @@ body {
       fill: #fff; }
 
 .xmastree-ctrls {
-  max-width: 255px;
+  max-width: inherit;
   margin: 0 auto; }
   .xmastree-ctrls {
     font-size: 10px; }
@@ -667,7 +667,7 @@ body {
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.04);
   background-color: #fff;
   display: inline-block;
-  width: 4em;
+  width: auto;
   margin-left: 0.5em;
   font-size: 1em;
   vertical-align: middle; }
