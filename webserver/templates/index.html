@@ -18,6 +18,20 @@
 	<meta name="application-name" content="Particle: Christmas Tree">
 	<meta name="theme-color" content="#ffffff">
 	<link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}">
+	<script src="{{ url_for('static', filename = 'jquery-3.4.1.min.js') }}"></script>
+
+	<script>
+			function button_handler(name)
+			{
+				if(name == "play_song"){
+					var idx = $(".xmastree-song-list option:selected")[0].value;
+					$.post("/control", { button: name, song_idx: idx });
+				}
+				else{
+					$.post("/control", {button: name});
+				}
+			}
+	</script>
 </head>
 
 <body data-gr-c-s-loaded="true">
@@ -56,7 +70,8 @@
 									<circle cx="645.9586" cy="896.6617" r="16" fill="#000"></circle>
 								</svg></div>
 							<div class="xmastree-ctrls">
-								<div class="xmastree-song-picker"><label>Song:</label><button title="Play"><svg
+								<div class="xmastree-song-picker"><label>Song:</label>
+									<button type="button" title="Play" name="play_song" onclick="button_handler(this.name)"><svg
 											viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
 											<path
 												d="M405.2,232.9L126.8,67.2c-3.4-2-6.9-3.2-10.9-3.2c-10.9,0-19.8,9-19.8,20H96v344h0.1c0,11,8.9,20,19.8,20 c4.1,0,7.5-1.4,11.2-3.4l278.1-165.5c6.6-5.5,10.8-13.8,10.8-23.1C416,246.7,411.8,238.5,405.2,232.9z">
@@ -70,7 +85,7 @@
 								</div>
 								<div class="xmastree-animation-picker"><label>Animation:</label>
 									<!-- <form action="" method="post"> -->
-										<button name="prev" title="Prev"><svg viewBox="0 0 512 512"
+										<button type="button" name="prev_animation" onclick="button_handler(this.name)" title="Prev"><svg viewBox="0 0 512 512"
 												xmlns="http://www.w3.org/2000/svg">
 												<g>
 													<path
@@ -80,7 +95,7 @@
 											</svg></button>
 									<!-- </form> -->
 									<!-- <form action="" method="post"> -->
-										<button name="next" title="Next"><svg viewBox="0 0 512 512"
+										<button type="button" name="next_animation" onclick="button_handler(this.name)" title="Next"><svg viewBox="0 0 512 512"
 												xmlns="http://www.w3.org/2000/svg">
 												<g>
 													<path

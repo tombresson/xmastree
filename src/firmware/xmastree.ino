@@ -186,9 +186,13 @@ int playOneSong(String songIndex)
 {
     Serial.println("playOneSong");
 
-    play_only_one_song = true;
+    // Should only be able to play one song (from the cloud), if at least the animation is running
+    // Otherwise leave it off
+    if(currentState != STATE_NONE){
+        play_only_one_song = true;
 
-    playSong(songIndex);
+        playSong(songIndex);
+    }
 }
 
 /* Stop the current song playing */
@@ -474,48 +478,37 @@ void processSongs()
     while (1)
     {
         changeSong = false;
+        bool song_finished = false;
 
         if ((currentState == STATE_BOTH) || (currentState == STATE_SONG))
         {
             if (currentSong == SONG_JOYTOTHEWORLD)
-                playJoyToTheWorld();
+                song_finished = playJoyToTheWorld();
             else if (currentSong == SONG_WEWHISHYOUAMERRYXMAS)
-                playWeWishYouAMerryXmas();
+                song_finished = playWeWishYouAMerryXmas();
             else if (currentSong == SONG_RUDOLFTHEREDNOSEDREINDEER)
-                playRudolfTheRedNosedReindeer();
+                song_finished = playRudolfTheRedNosedReindeer();
             else if (currentSong == SONG_JINGLEBELLS)
-                playJingleBells();
+                song_finished = playJingleBells();
             else if (currentSong == SONG_SILENTNIGHT)
-                playSilentNight();
+                song_finished = playSilentNight();
             else if (currentSong == SONG_ROCKINGAROUND)
-                playRockingAround();
+                song_finished = playRockingAround();
             else if (currentSong == SONG_CAROLOFTHEBELLS)
-                playCarolOfTheBells();
+                song_finished = playCarolOfTheBells();
             else
             {
                 // do nothing
             }
 
-            if (play_only_one_song)
+            if (play_only_one_song && song_finished)
             {
-                if (currentState == STATE_BOTH)
-                {
-                    currentState = STATE_ANIMATION;
-                }
-                else if (currentState == STATE_SONG)
-                {
-                    currentState = STATE_NONE;
-                }
-                else
-                {
-                    // Do nothing
-                }
-
+                stopSong("");
                 play_only_one_song = false;
             }
         }
 
-        delay(2000);
+        delay(1000);
 
     }
 }
