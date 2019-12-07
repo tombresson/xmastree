@@ -32,7 +32,7 @@ def nextAnimation():
                      params=token)
 
 def prevAnimation():
-    r = requests.post('https://api.particle.io/v1/devices/' + device_id + '/nextPrev',
+    r = requests.post('https://api.particle.io/v1/devices/' + device_id + '/prevAnim',
                      params=token)
 
 # main()
