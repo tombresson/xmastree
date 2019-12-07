@@ -633,21 +633,23 @@ body {
     font-size: 1.25em; }
   .xmastree-song-picker > button,
   .xmastree-animation-picker > button {
-    height: 2.25em;
-    width: 2.25em;
     padding: 0;
     background-color: transparent;
     border: none;
     outline: none;
     cursor: pointer;
     display: inline-block;
-    height: 2.5em;
-    width: 2.5em;
     padding: 0.25em;
     border: 1px solid #ccc;
     border-radius: 0.4em;
     background-color: #fff;
     vertical-align: middle; }
+    .xmastree-animation-picker > button{
+      height: 5em;
+      width: 5em;}
+    .xmastree-song-picker > button{
+      height: 2.5em;
+      width: 2.5em;}
     .xmastree-song-picker > button > svg,
     .xmastree-animation-picker > button > svg {
       width: 100%; }
