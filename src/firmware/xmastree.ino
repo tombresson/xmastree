@@ -30,6 +30,7 @@
 
 #include "xmastree.h" // All macros (#define) are in xmastree.h
 #include <dotstar.h>
+#include "credentials.h"
 
 /* Project name and version */
 #define WHOAMI "XmasTree"
@@ -606,6 +607,15 @@ void printTree()
 /* Wiring programming starts from setup() and then calling loop() */
 void setup()
 {
+    // Setup credentials for known networks
+    credentialList_t *list = credentialsGetList();
+
+    for(int idx = 0; idx < list->size; idx++)
+    {
+        const credentialData_t current_cred = ssid,list->cred_list[idx];
+        WiFi.setCredentials(current_cred.ssid,current_cred.pw , current_cred.sec_type);
+    }
+
     /* LEDs setup */
     ledsInit();
 

@@ -57,7 +57,7 @@ typedef struct
 {
     const credentialData_t *cred_list;
     const int size;
-}credList_t;
+}credentialList_t;
 
 /* ***********************   Function Prototypes   ************************ */
 
