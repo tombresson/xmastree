@@ -89,3 +89,4 @@ yarn-error.log*
 
 # Particle Specific
 *.bin.*
+*.dfu
