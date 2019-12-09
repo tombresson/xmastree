@@ -70,9 +70,9 @@ const credentialData_t cred_list[] =
 /* *************************   Public  Functions   ************************ */
 
 // Returns a list of credentials
-credList_t credentialsGetList(void)
+credentialList_t credentialsGetList(void)
 {
-    return (credList_t){ .cred_list = cred_list, .size = ARRAY_SIZE(cred_list)};
+    return (credentialList_t){ .cred_list = cred_list, .size = ARRAY_SIZE(cred_list)};
 }
 
 /* *************************   Private Functions   ************************ */

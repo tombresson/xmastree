@@ -61,7 +61,7 @@ typedef struct
 
 /* ***********************   Function Prototypes   ************************ */
 
-credList_t credentialsGetList(void);
+credentialList_t credentialsGetList(void);
 
 /** @} */
 

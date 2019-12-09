@@ -608,12 +608,12 @@ void printTree()
 void setup()
 {
     // Setup credentials for known networks
-    credentialList_t *list = credentialsGetList();
+    credentialList_t list = credentialsGetList();
 
-    for(int idx = 0; idx < list->size; idx++)
+    for(int idx = 0; idx < list.size; idx++)
     {
-        const credentialData_t current_cred = ssid,list->cred_list[idx];
-        WiFi.setCredentials(current_cred.ssid,current_cred.pw , current_cred.sec_type);
+        const credentialData_t current_cred = list.cred_list[idx];
+        WiFi.setCredentials(current_cred.ssid, current_cred.pw, current_cred.sec_type);
     }
 
     /* LEDs setup */
